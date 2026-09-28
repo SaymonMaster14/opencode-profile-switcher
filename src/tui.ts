@@ -1,5 +1,3 @@
-import { jsx } from "@opentui/solid/jsx-runtime"
-import { createSignal } from "solid-js"
 import type { TuiDialogSelectOption, TuiPlugin, TuiPluginApi, TuiPluginMeta, TuiPluginModule } from "@opencode-ai/plugin/tui"
 import { pluginConfigMatches, pluginReferences, readGlobalConfig, setGlobalServerPlugins, disposeAllInstances, disposeCurrentInstance } from "./adapters/opencode11832.ts"
 import { reconcileTuiPlugins } from "./adapters/tui11832.ts"
@@ -226,7 +224,6 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
     }
     toast(api, `Removed ${abandoned.length} temporary profile${abandoned.length === 1 ? "" : "s"} left by a closed session`, "info")
   }
-  const [activeLabel, setActiveLabel] = createSignal("OpenCode profile: Base")
   const caps = capabilities(api)
   let leaseTimer: ReturnType<typeof setInterval> | undefined
 
@@ -242,12 +239,8 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
     return snapshot
   }
 
-  const updateIndicator = async () => {
-    const current = await loadSnapshot()
-    const id = currentProfileId(current.index)
-    const name = id === "base" ? "Base" : current.profiles.find((profile) => profile.id === id)?.name ?? id
-    const suffix = process.env.OPENCODE_PROFILE_LAUNCH === "1" ? " · isolated launch" : ""
-    setActiveLabel(`Profile · ${name}${suffix}`)
+  const refreshRuntimeLease = async () => {
+    await loadSnapshot()
     await updateLease()
   }
 
@@ -444,7 +437,7 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
 
       await updateStoreIndex(root, (index) => ({ ...index, lastAppliedServerPlugins: target.plugins.server }))
       if (from.temporary && from.id !== target.id) await removeStoredProfile(root, from.id)
-      await updateIndicator()
+      await refreshRuntimeLease()
       const turnedOff = reconciled.deactivated.length
       const reloadText = serverChanged ? "server instances reloaded" : plan.required === "INSTANCE_RELOAD" || forceReload ? "instance reloaded" : "live switch"
       toast(api, `${target.name} active · ${turnedOff} TUI plugins turned off · ${reloadText}`, "success")
@@ -464,7 +457,7 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
           pendingProfileId: oldIndex.pendingProfileId,
         })).catch(() => undefined)
       }
-      await updateIndicator().catch(() => undefined)
+      await refreshRuntimeLease().catch(() => undefined)
       toast(api, `Profile switch rolled back: ${(error as Error).message}`, "error")
       return false
     }
@@ -652,7 +645,7 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
         const remove = async () => {
           if (currentProfileId((await readStore(root)).index) === id) throw new Error("Profile is still active; it was not deleted")
           await removeStoredProfile(root, id)
-          await updateIndicator()
+          await refreshRuntimeLease()
           toast(api, `Deleted profile ${id}`, "success")
           await showPicker()
         }
@@ -725,7 +718,7 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
               if (discovered.hasServer) await disposeAllInstances(api.client)
             }
             await updateStoreIndex(root, (index) => ({ ...index, lastAppliedServerPlugins: active.plugins.server }))
-            await updateIndicator()
+            await refreshRuntimeLease()
             toast(api, `${info.name} installed and pinned to ${discovered.commit.slice(0, 12)}`, "success")
             await showPicker()
           })().catch((error) => toast(api, `Plugin installation failed: ${(error as Error).message}`, "error"))
@@ -752,7 +745,7 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
     }
   }
 
-  await updateIndicator()
+  await refreshRuntimeLease()
   api.keymap.registerLayer({
     commands: [{
       name: "profile.switcher.open",
@@ -764,11 +757,6 @@ const tui: TuiPlugin = async (api, _options, meta: TuiPluginMeta) => {
     }],
   })
 
-  api.slots.register({
-    slots: {
-      app_bottom: () => jsx("text", { children: () => activeLabel() }),
-    },
-  })
   leaseTimer = setInterval(() => { void updateLease().catch(() => undefined) }, 15_000)
   leaseTimer.unref?.()
   api.lifecycle.onDispose(() => {

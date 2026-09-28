@@ -15,7 +15,7 @@ if ($release.sha -notmatch "^[0-9a-f]{40}$") {
 
 $plugin = "github:$repository#$($release.sha)"
 Write-Host "Installing OpenCode Profile Switcher globally from commit $($release.sha.Substring(0, 12))..."
-& opencode plugin $plugin --global
+& opencode plugin $plugin --global --force
 if ($LASTEXITCODE -ne 0) {
   throw "OpenCode could not install $plugin."
 }
