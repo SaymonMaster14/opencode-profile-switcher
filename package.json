@@ -1,0 +1,59 @@
+{
+  "name": "opencode-profile-switcher",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Switch OpenCode profiles from the stable TUI with an explicit isolation report.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "opencode": ">=1.18.32 <2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SaymonMaster14/opencode-profile-switcher.git"
+  },
+  "files": [
+    "src",
+    "bin",
+    "examples",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./tui": "./src/tui.ts",
+    "./core": "./src/core/index.ts"
+  },
+  "bin": {
+    "opencode-profile": "./bin/opencode-profile.mjs"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit && node scripts/marker.mjs TYPECHECK_PASSED",
+    "test": "bun test",
+    "test:core": "bun test test/core.test.ts",
+    "test:tui": "bun test test/tui.test.ts",
+    "test:server": "bun test test/server.test.ts",
+    "test:isolation": "bun test test/isolation.test.ts",
+    "test:plugins": "bun test test/plugins.test.ts",
+    "test:ephemeral": "bun test test/ephemeral.test.ts",
+    "smoke:stable": "bun scripts/smoke-stable.mjs",
+    "verify": "bun run typecheck && bun test && node scripts/marker.mjs PROFILE_MANAGER_VERIFY_PASSED"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.18.32 <2",
+    "@opentui/core": ">=0.4.5",
+    "@opentui/keymap": ">=0.4.5",
+    "@opentui/solid": ">=0.4.5"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "1.18.32",
+    "@opencode-ai/sdk": "1.18.32",
+    "@opentui/core": "^0.4.5",
+    "@opentui/keymap": "^0.4.5",
+    "@opentui/solid": "^0.4.5",
+    "@types/bun": "^1.2.20",
+    "@types/node": "^24.0.0",
+    "solid-js": "^1.9.0",
+    "typescript": "^5.8.2"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "review-workflow",
+  "name": "Review workflow",
+  "description": "Inline reviewer agent and command, with profile-owned skills and no inherited MCPs.",
+  "createdAt": 0,
+  "updatedAt": 0,
+  "isolationMode": "layered",
+  "inheritance": {
+    "globalConfig": true,
+    "projectConfig": true,
+    "globalServerPlugins": true,
+    "projectServerPlugins": true,
+    "globalTuiPlugins": true,
+    "projectTuiPlugins": true,
+    "globalSkills": true,
+    "projectSkills": true,
+    "mcp": false
+  },
+  "config": {
+    "agent": {
+      "reviewer": {
+        "description": "Find correctness risks in the current changes.",
+        "mode": "subagent",
+        "prompt": "Review the current changes for concrete bugs, regressions, and missing edge cases. Report findings with file and line references.",
+        "tools": {
+          "bash": false,
+          "edit": false
+        }
+      }
+    },
+    "command": {
+      "review-diff": {
+        "description": "Review the current changes.",
+        "template": "Review the current changes. Focus on correctness, regressions, and missing tests.",
+        "agent": "reviewer",
+        "subtask": true
+      }
+    },
+    "skills": {
+      "paths": [
+        "skills"
+      ],
+      "urls": []
+    },
+    "mcp": {}
+  },
+  "plugins": {
+    "server": [],
+    "tui": []
+  },
+  "environment": {}
+}

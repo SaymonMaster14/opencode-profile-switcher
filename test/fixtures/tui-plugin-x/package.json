@@ -1,0 +1,7 @@
+{
+  "name": "profile-smoke-tui-plugin-x",
+  "type": "module",
+  "exports": {
+    "./tui": "./tui.mjs"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "clean-room",
+  "name": "Clean room",
+  "description": "Minimal profile with isolated config and no inherited skills or MCPs.",
+  "createdAt": 0,
+  "updatedAt": 0,
+  "isolationMode": "isolated-launch",
+  "inheritance": {
+    "globalConfig": false,
+    "projectConfig": false,
+    "globalServerPlugins": false,
+    "projectServerPlugins": false,
+    "globalTuiPlugins": false,
+    "projectTuiPlugins": false,
+    "globalSkills": false,
+    "projectSkills": false,
+    "mcp": false
+  },
+  "config": {
+    "tools": {
+      "skill": false
+    },
+    "permission": {
+      "skill": "deny"
+    },
+    "skills": {
+      "paths": [],
+      "urls": []
+    },
+    "mcp": {}
+  },
+  "plugins": {
+    "server": [],
+    "tui": []
+  },
+  "environment": {}
+}
